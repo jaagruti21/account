@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+	<configuration-properties file="config.yaml"/>
+	<mongo:config name="MongoDB_Config" doc:name="MongoDB Config" doc:id="46f6ad00-0b9e-4f72-b687-d3067c9330c9">
+<mongo:connection-string-connection connectionString="mongodb+srv://jagruti:mule1111@mulesoft.hyzftbi.mongodb.net/crudapi"/>
+</mongo:config>
+<file:config name="File_Config" doc:name="File Config" doc:id="11dae026-8f17-4789-b7dc-b7cf1f21989f"/>
+<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3d438d9a-3aae-4d40-8689-146c01e59e6c">
+<http:request-connection host="dummy.restapiexample.com"/>
+</http:request-config>
+<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="386a7e20-7538-442a-8828-8dcafe405e60">
+<http:listener-connection host="0.0.0.0" port="8080"/>
+</http:listener-config>
+<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="575d4a90-fb5a-4086-85b6-7aa3cc7d52e2">
+		<http:request-connection protocol="HTTPS"/>
+	</http:request-config>
+	<mongo:config name="MongoDB_Config1" doc:name="MongoDB Config" doc:id="95718d23-5be5-49d7-9598-dfd4f1f8ae23" >
+		<mongo:connection-string-connection connectionString="mongodb+srv://jagruti:mule1111@mulesoft.hyzftbi.mongodb.net/bankacc" />
+	</mongo:config>
+	<xml-module:config name="XML_Config" doc:name="XML Config" doc:id="c86ea6a9-afe6-4dbe-9f82-b11df3ecfebd" />
+	<xml-module:config name="JSON_config" doc:name="XML Config" doc:id="febc1a9d-debc-48c3-a930-56603cca511c" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="61882c36-2070-48b9-87fe-feab3356b7ad" file="config.yaml" key="mulesoft" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<http:request-config name="HTTP_Request_configuration2" doc:name="HTTP Request configuration" doc:id="68164235-6655-48fe-89b8-8714d5f62549" >
+		<http:request-connection protocol="HTTPS" />
+	</http:request-config>
+	<flow name="getFlow" doc:id="8a6c9098-bc37-40da-b0af-f8b14a9fe4d0">
+<http:listener doc:name="Listener" doc:id="57045f39-8f79-4c1c-9778-02e88a731df7" config-ref="HTTP_Listener_config" path="/sourcedata" allowedMethods="GET"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ae2381ec-e97b-4bde-a434-6acc078771f3" message="flow started"/>
+<scatter-gather doc:name="Scatter-Gather" doc:id="ccbb99d7-a669-4a08-85c3-0d3e27ee0095">
+<route>
+<mongo:find-documents doc:name="Find documents" doc:id="e2b85b4b-194b-423b-8040-ca33c1b8c408" config-ref="MongoDB_Config" collectionName="users" fields="id,username,role,place"/>
+				<set-variable variableName="mongoResponse" value="#[payload]" doc:name="Store MongoDB Response"/>
+<logger message="Payload from MongoDB: #[payload]" level="INFO" doc:name="Logger"/>
+</route>
+<route>
+<file:read doc:name="Read File" doc:id="51a2eea2-ea47-4d6e-8223-2e70166a918b" config-ref="File_Config" path="/home/jagruti/readfile.txt"/>
+<set-variable variableName="readResponse" value="#[payload]" doc:name="Store File Response"/>
+<logger level="INFO" doc:name="Logger" doc:id="ba563d3f-4bdb-410a-8f2e-8fcf8cf53861" message="Payload from File: #[payload]"/>
+</route>
+<route>
+<http:request method="GET" doc:name="Request" doc:id="221cbc2b-aa0f-4fef-9603-ccff784200df" config-ref="HTTP_Request_configuration" path="/api/v1/employees"/>
+<set-variable variableName="apiResponse" value="#[payload]" doc:name="Store API Response"/>
+<logger level="INFO" doc:name="Logger" doc:id="3047af26-b6f5-4bbe-93b1-49496468cff6" message="Payload from Api: #[payload]"/>
+</route>
+</scatter-gather>
+<ee:transform doc:name="Transform Message" doc:id="5eee4277-4fb0-44c6-8bfc-7d3c8d40ebe4">
+<ee:message>
+<ee:set-payload>
+<![CDATA[ %dw 2.0 output application/json --- { "data_from_mongo":vars.mongoResponse, "data_from_api": vars.apiResponse, "data_from_file": vars.readResponse } ]]>
+</ee:set-payload>
+</ee:message>
+</ee:transform>
+<error-handler>
+<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e98f4981-eada-400f-b64e-6d2c70b2fc2a">
+<ee:transform doc:name="Transform Message" doc:id="71913c02-f6d0-4b76-aadd-140c60d5ea79">
+<ee:message>
+<ee:set-payload>
+<![CDATA[ %dw 2.0 output application/json --- { "error": "An error occurred while processing the request." } ]]>
+</ee:set-payload>
+</ee:message>
+</ee:transform>
+</on-error-propagate>
+</error-handler>
+</flow>
+	<flow name="GETCredentialsFlow">
+    <http:listener config-ref="HTTP_Listener_config" path="/data" allowedMethods="GET"/>
+    <!-- Retrieve credentials from the request -->
+    <!-- Invoke Anypoint Secrets Manager API to store the credentials -->
+    <http:request method="GET" config-ref="HTTP_Request_configuration1" doc:name="Store Credentials" url="https://anypoint.mulesoft.com/secrets-manager/api/v1/organizations/baa2af3d-5369-44c6-81d4-acfd57c93b50/environments/53b75c44-a865-4233-8149-6fb0dbb9e23e/secretGroups">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Basic amFncnV0aTIxOmdhaWt3YWRKMTIzNDVA"
+}]]]></http:headers>
+    </http:request>
+		<ee:transform doc:name="Transform Message" doc:id="1f9a45ec-37be-4709-b4f1-a5b2b7711e83" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    <!-- Logger to log the response from Secrets Manager API -->
+    <!-- Handle response from Secrets Manager API -->
+    <!-- You can add additional components here to process the response as needed -->
+</flow>
+	<flow name="deleteapiFlow" doc:id="926803cd-fd83-4720-85e3-5c0d1a8bf311" >
+		<http:listener doc:name="Listener" doc:id="a4e6c678-22f3-470a-ab78-6a3b13ccde74" config-ref="HTTP_Listener_config" path="/deleteapi" allowedMethods="DELETE"/>
+		<http:request method="DELETE" doc:name="Request" doc:id="a306b1b0-a4e9-41f9-8453-5eda5ba3fdaa" url="https://anypoint.mulesoft.com/secrets-manager/api/v1/organizations/baa2af3d-5369-44c6-81d4-acfd57c93b50/environments/53b75c44-a865-4233-8149-6fb0dbb9e23e/secretGroups/a4498ba9-f2fb-42e3-ac72-9505994daf68">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Basic amFncnV0aTIxOmdhaWt3YWRKMTIzNDVA"
+}]]]></http:headers>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"id" : "3b90d96c-f3a3-46ca-a818-5cfa8be24832"
+}]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="90390337-2a28-45c5-b1ad-b9b7452d2739" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "credentials deleted"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	
+	<flow name="POSTcredentialsFlow" doc:id="8a3cd915-22bc-4e09-b3c0-4c44127b16ea" >
+        <http:listener doc:name="Listener" doc:id="1f1fdcda-a1e5-440a-9b3e-36d990345bbf" config-ref="HTTP_Listener_config" path="/createsource" allowedMethods="POST"/>
+        <http:request method="POST" doc:name="Request" doc:id="1834a647-d573-4b98-8b01-b6dcf56c589f" config-ref="HTTP_Request_configuration1" sendCorrelationId="NEVER" url="https://anypoint.mulesoft.com/secrets-manager/api/v1/organizations/baa2af3d-5369-44c6-81d4-acfd57c93b50/environments/53b75c44-a865-4233-8149-6fb0dbb9e23e/secretGroups/a4498ba9-f2fb-42e3-ac72-9505994daf68/sharedSecrets">
+            <http:headers ><![CDATA[#[output application/java
+---
+{
+    "Authorization" : "Basic amFncnV0aTIxOmdhaWt3YWRKMTIzNDVA",
+    "Content-Type": "application/json"
+}]]]></http:headers>
+        </http:request>
+        <ee:transform doc:name="Transform Message" doc:id="80856aa4-37b2-48b3-877e-9f34f6921136" >
+            <ee:message >
+                <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "message": "inserted"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="getflowsecretFlow" doc:id="597b738a-6085-40cb-ba22-f29e51165d5e" >
+		<http:listener doc:name="Listener" doc:id="ec0b8797-1e94-4c47-a9a5-5a3daf61bfc9" config-ref="HTTP_Listener_config" path="/secret" allowedMethods="GET"/>
+		<http:request method="GET" doc:name="Request" doc:id="29fc6c93-c84c-4ea7-a05a-cb2649a59fe0" config-ref="HTTP_Request_configuration1" url="https://anypoint.mulesoft.com/secrets-manager/api/v1/organizations/baa2af3d-5369-44c6-81d4-acfd57c93b50/environments/53b75c44-a865-4233-8149-6fb0dbb9e23e/secretGroups/8fd4645b-fd69-4f17-b53a-d8373c545fb5/sharedSecrets/a3d7dee7-cf44-4343-9705-644a2c9c0c9e">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer 3366e7d6-be35-4482-86e4-bfa030126017"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="69425133-aa2d-45e0-90c7-d2f026678655" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+<flow name="GETcredentialsFlow1" doc:id="383b499c-3eac-4f47-972b-9f9548ea6ec4" >
+        <http:request method="POST" doc:name="Request" doc:id="41d03ac1-cafd-4b92-a34c-2fde3c39994c" config-ref="HTTP_Request_configuration2" url="https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token">
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+    "client_id": "4067f22c83954eba9bcc36cd79b5470d",
+    "client_secret": "6d7B16aab356481097Fec6c410bA54FD",
+    "grant_type": "client_credentials"
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+    
+        <set-variable value="#[payload.access_token]" doc:name="accessToken" doc:id="3014e148-2f2f-43e7-9342-acf247bb827a" variableName="accessToken"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="b546eb38-181c-4447-a8d3-0e8e2b01bd98" >
+            <route >
+				<http:request method="GET" doc:name="Request" doc:id="0c3aee89-9d43-495b-beec-2bcabd71d98d" config-ref="HTTP_Request_configuration2" sendCorrelationId="NEVER" url="${secretManager.url}">
+                    <http:headers><![CDATA[#[output application/java
+---
+{
+    "Authorization" : "Bearer " ++ vars.accessToken,
+    "Content-Type": "application/json"
+}]]]></http:headers>
+                    
+        </http:request>
+                
+                <set-variable value="#[payload]" doc:name="getdataapi" doc:id="994ca446-30a0-449e-ad27-6f68ecbaf068" variableName="getdataapi"/>
+                <logger level="INFO" doc:name="Logger" doc:id="de9a6c59-771e-4238-b17d-c28da17fe08a" message="Payload from Secretmanager #[payload]"/>
+            </route>
+            <route >
+                
+                    <mongo:find-documents doc:name="Find documents" doc:id="12be547a-e4df-46fa-b01b-81cadccfde28" config-ref="MongoDB_Config1" collectionName="accounts" fields="id,accountNumber,owner,bankName" />
+                
+                <set-variable value="#[payload]" doc:name="getdatamongo" doc:id="583e63f3-626e-4a78-b2e4-daf9cb4923ac" variableName="getdatamongo"/>
+                <logger level="INFO" doc:name="Logger" doc:id="93dd5a52-b16c-4b83-9799-e698b7e2cdaa" message="Payload from MongoDB: #[payload]"/>
+            </route>
+        </scatter-gather>
+        <ee:transform doc:name="Transform Message" doc:id="b5c2ab85-1ac6-4403-9046-4468103850ff" >
+            <ee:message >
+                <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+   
+        
+        "data": vars.getdatamongo
+            map ((mongoItem, index) -> {
+                secret: vars.getdataapi[index], 
+                mongo: mongoItem
+            })
+    
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <error-handler>
+    <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" type="ANY">
+                <ee:transform doc:name="Transform Message" doc:id="19e4844c-e1bf-43e9-87c4-8018e54c1e70" >
+                    <ee:message >
+                        <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "statusCode": 500,
+    "error": "Internal server error"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+    </on-error-propagate>
+  </error-handler>
+    </flow>
+	<flow name="POSTcredentialsFlow1" doc:id="2a807e7e-a48c-49af-a0f0-ee0020513eaa" >
+	<http:request method="GET" doc:name="Request" doc:id="7f33bc53-5f04-4e9d-ae9c-828db052e645" config-ref="HTTP_Request_configuration2" path="https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token">
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+    "client_id": "4067f22c83954eba9bcc36cd79b5470d",
+    "client_secret": "6d7B16aab356481097Fec6c410bA54FD",
+    "grant_type": "client_credentials"
+}]]]></http:body>
+<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+		<set-variable variableName="accessToken" doc:name="Set Access Token" value="#[payload.access_token]"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="2d3b084e-52a6-4b8b-b0fb-2f09d94ec76b" >
+            <route >
+				
+				<http:request method="POST" doc:name="Request" doc:id="f7c2f2fe-ba89-4f62-a0ae-55055c6bf784" config-ref="HTTP_Request_configuration1" sendCorrelationId="NEVER" url="${secretManager.url}">
+            <http:body ><![CDATA[#[{
+    "name": payload.name,
+    "type": payload.'type',
+    "username": payload.username,
+    "password": payload.password
+}]]]></http:body>
+                    <http:headers><![CDATA[#[output application/java
+---
+{
+     "Authorization" : "Bearer " ++ vars.accessToken,
+    "Content-Type": "application/json"
+}]]]></http:headers>
+        </http:request>
+            </route>
+            <route >
+                <mongo:insert-document collectionName="accounts" doc:name="Insert document" doc:id="6a05a733-290a-4e95-b8e1-3e249c727269" config-ref="MongoDB_Config1">
+                    <mongo:document ><![CDATA[#[{
+    "accountNumber": payload.accountNumber,
+    "owner": payload.owner,
+    "bankName": payload.bankName,
+    "id": uuid()
+    
+}]]]></mongo:document>
+                </mongo:insert-document>
+            </route>
+        </scatter-gather>
+        <ee:transform doc:name="Transform Message" doc:id="50a35e0a-1206-400b-af46-f344ac5cbe0f" >
+            <ee:message >
+                <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "statusCode": "200",
+    "message": "Data inserted successfully"
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="888ec771-bd77-4e9d-bd63-e4206a5b6062" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="5e3f1593-20c1-4520-94eb-f6eb54b22536" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"statusCode": "500",
+	"error": "Internal server error"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+    </flow>
+	<flow name="UPDATEcredentialsFlow" doc:id="5cf80da4-8bee-4731-a29d-1153163f0f89">
+		<set-variable variableName="secretId" value="#[attributes.uriParams.secretId]" doc:name="secretId" />
+		<set-variable value="#[attributes.uriParams.id]" doc:name="id" doc:id="d6966b31-e8e6-4722-abf5-bad2a18be8c5" variableName="id"/>
+			<http:request method="POST" doc:name="Request" doc:id="1762837e-c76e-4502-a4e4-6072b7277e25" config-ref="HTTP_Request_configuration2" url="https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token">
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+    "client_id": "4067f22c83954eba9bcc36cd79b5470d",
+    "client_secret": "6d7B16aab356481097Fec6c410bA54FD",
+    "grant_type": "client_credentials"
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+    
+		<set-variable variableName="accessToken" doc:name="Set Access Token" value="#[payload.access_token]"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="10699cf0-32f4-435b-9508-b52bc5f40f61" >
+			<route >
+				<http:request method="PUT" doc:name="Request" doc:id="9e1bc44f-9a85-4e7e-96f3-183a31614770" config-ref="HTTP_Request_configuration1" url="${secretManager.url1}" sendCorrelationId="NEVER">
+			<http:body><![CDATA[#[{
+    "name": payload.name,
+    "type": payload.'type',
+    "username": payload.username,
+    "password": payload.password
+}]]]></http:body>
+					<http:headers><![CDATA[#[output application/java
+---
+{
+	 "Authorization" : "Bearer " ++ vars.accessToken,
+}]]]></http:headers>
+     <http:uri-params><![CDATA[#[output application/java
+---
+{
+    
+    "secretId": vars.secretId
+}]]]></http:uri-params>
+		</http:request>
+			</route>
+			<route >
+				<mongo:update-documents collectionName="accounts" doc:name="Update documents" doc:id="402b724b-e2ae-43cb-966f-d1c9257de9ac" config-ref="MongoDB_Config1">
+					 <mongo:query><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+    "id": attributes.queryParams.id}]]]></mongo:query>
+					<mongo:content-to-update ><![CDATA[#[{
+    "accountNumber": payload.accountNumber,
+    "owner": payload.owner,
+    "bankName": payload.bankName
+    
+    
+    
+}]]]></mongo:content-to-update>
+				</mongo:update-documents>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="4a2488fc-8637-4823-b6d9-365bded118a8">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"statusCode": "200",
+	"message": "Data updated sucessfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9c2ff014-05f5-407a-9c28-bb7d43864ed2" >
+				<ee:transform doc:name="Transform Message" doc:id="f59072c6-7a3b-4edd-a42a-c0b8468cdac6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"statusCode": "500",
+	"error": "Internal server error"
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="getbyidcredentialsFlow1" doc:id="f8ef38f6-4e60-429f-b444-1d6d52c486aa" >
+		<set-variable variableName="secretId" value="#[attributes.uriParams.secretId]" doc:name="secretId" />
+		<set-variable value="#[attributes.uriParams.id]" doc:name="id" doc:id="5a7da599-fb79-4230-a262-fd634e597855" variableName="id"/>
+		<http:request method="POST" doc:name="Request" doc:id="0908efb9-4f9e-4170-a3e2-aa4bdc675744" config-ref="HTTP_Request_configuration2" url="https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token">
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+    "client_id": "4067f22c83954eba9bcc36cd79b5470d",
+    "client_secret": "6d7B16aab356481097Fec6c410bA54FD",
+    "grant_type": "client_credentials"
+}]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+    
+	<set-variable variableName="accessToken" value="#[payload.access_token]" doc:name="Set Access Token" />
+    
+		<scatter-gather doc:name="Scatter-Gather" doc:id="03911233-b3d4-4c9a-baa0-7471dff60da6" >
+			<route >
+				<http:request method="GET" doc:name="Request" doc:id="19fee8a6-1187-448b-a9dc-1df343bba007" config-ref="HTTP_Request_configuration1" url="${secretManager.url1}">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	 "Authorization" : "Bearer " ++ vars.accessToken,
+}]]]></http:headers>
+					
+        <http:uri-params><![CDATA[#[output application/java
+---
+{
+    
+    "secretId": vars.secretId
+}]]]></http:uri-params>
+		</http:request>
+		<set-variable value="#[payload]" doc:name="Getspecificdataapi" doc:id="09243564-9ca9-42d4-83e1-f5a9cff9ff64" variableName="Getspecificdataapi"/>
+				<logger level="INFO" doc:name="Logger" doc:id="e73c08e9-ae50-489b-bfff-34a2bc497712" message="Payload from Secretmanager #[payload]"/>
+			</route>
+			<route >
+				<mongo:find-documents collectionName="accounts" fields="id,accountNumber,owner,bankName" doc:name="Find documents" doc:id="7bfca35a-b70b-4162-bdb4-f612a943c65b" config-ref="MongoDB_Config1">
+			<mongo:query><![CDATA[#[%dw 2.0 
+ output application/json 
+ ---
+  { "id": vars.id}]]]>
+</mongo:query>
+					
+			</mongo:find-documents>
+			<set-variable value="#[payload]" doc:name="Getspecificdatamongo" doc:id="a77b9e69-51e2-404a-a0a9-aeec8b82c5a2" variableName="Getspecificdatamongo"/>
+				<logger level="INFO" doc:name="Logger" doc:id="742dbf4c-501c-4538-80b8-3ae281c4625d" message="Payload from MongoDB: #[payload]"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="8d4c62de-e434-46c1-b3ae-a44dbc58aa80" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{ "data_from_secrets":vars.Getspecificdataapi, "data_from_mongo": vars.Getspecificdatamongo }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ff82ece4-1edd-453d-a29f-c6826bd5c288" >
+				<ee:transform doc:name="Transform Message" doc:id="cba9104f-39d6-4aa4-9dd5-ad7e0df40249" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"statusCode": "500",
+	"error": "Internal server error"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	</mule>

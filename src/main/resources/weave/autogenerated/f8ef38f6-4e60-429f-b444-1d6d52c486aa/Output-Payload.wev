@@ -1,0 +1,17 @@
+%dw 2.0
+
+type auto_f8ef38f6_4e60_429f_b444_1d6d52c486aa_Output_Payload = {
+  data_from_mongo?: Array<{    owner?: String,     bankName?: String,     id?: String,     accountNumber?: String,     _?: Any  }> {"description": "Data retrieved from MongoDB"}, 
+  data_from_secrets?: {
+    secret_info?: {
+      password?: String, 
+      name?: String, 
+      "type"?: String, 
+      username?: String, 
+      _?: Any
+    }, 
+    _?: Any
+  } {"description": "Data retrieved from Secrets"}, 
+  _?: Any
+}
+

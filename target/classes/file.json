@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    },
+    "password": {
+      "type": "string"
+    },
+    "accountNumber": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "bankName": {
+      "type": "string"
+    }
+    
+  },
+  "required": [
+    "name",
+    "type",
+    "username",
+    "password",
+    "accountNumber",
+    "owner",
+    "bankName"
+   
+  ]
+}
