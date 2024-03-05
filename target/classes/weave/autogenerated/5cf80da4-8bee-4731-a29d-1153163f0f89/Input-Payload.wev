@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_5cf80da4_8bee_4731_a29d_1153163f0f89_Input_Payload = {
+  owner?: String, 
+  password?: String, 
+  name?: String, 
+  bankName?: String, 
+  "type"?: String, 
+  accountNumber?: String, 
+  username?: String, 
+  _?: Any
+}
+

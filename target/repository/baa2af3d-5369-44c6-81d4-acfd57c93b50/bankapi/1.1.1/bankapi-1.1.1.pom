@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>baa2af3d-5369-44c6-81d4-acfd57c93b50</groupId>
+  <artifactId>bankapi</artifactId>
+  <version>1.1.1</version>
+  <name>bankapi</name>
+  <properties>
+    <classifier>oas</classifier>
+    <main>bankapi.yaml</main>
+    <status>published</status>
+    <originalFormatVersion>3.0</originalFormatVersion>
+    <apiVersion>v1</apiVersion>
+    <projectId>189c2882-99d2-4fb5-905d-ec7fa9cca44e</projectId>
+    <branchId>master</branchId>
+    <commitId>1499a784e44fe6f480a3146166315dd08839865b</commitId>
+    <keywords/>
+    <type>rest-api</type>
+    <mainFile>bankapi.yaml</mainFile>
+  </properties>
+  <repositories>
+    <repository>
+      <id>anypoint-exchange</id>
+      <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+    </repository>
+  </repositories>
+</project>

@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_f8ef38f6_4e60_429f_b444_1d6d52c486aa_Output_Variables_Getspecificdatamongo = Array<Array<Document>>
+type Document = {|
+  "_id"?: {|  |}, 
+  accountNumber?: String, 
+  owner?: String, 
+  bankName?: String, 
+  id?: String
+|} {"typeId": "Document"}
+
+
+
